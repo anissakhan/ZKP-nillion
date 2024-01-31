@@ -24,12 +24,16 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
         question: where to store y1 and y2
         """
+
+        # Store y1 and y2 on the server
         user_temp_global=request.user
         y1_temp_global=request.y1
         y2_temp_global=request.y2
 
         # debug print values
         # return zkp_auth_pb2.RegisterResponse(result = f"registration successful {y1_temp_global=} {y2_temp_global=} {user_temp_global=}")
+
+        # Server sends back validation message that the registration was successful
         return zkp_auth_pb2.RegisterResponse(result = f"registration successful")
 
     def CreateAuthenticationChallenge(self, request, context):
