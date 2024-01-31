@@ -8,7 +8,9 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-
+    //whether or not the message was successfully registered
+    //changed from original template, which had this message empty (no fields)
+    string result = 1; 
 }
 
 message AuthenticationChallengeRequest {

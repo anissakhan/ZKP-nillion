@@ -15,8 +15,10 @@ class RegisterRequest(_message.Message):
     def __init__(self, user: _Optional[str] = ..., y1: _Optional[int] = ..., y2: _Optional[int] = ...) -> None: ...
 
 class RegisterResponse(_message.Message):
-    __slots__ = ()
-    def __init__(self) -> None: ...
+    __slots__ = ("result",)
+    RESULT_FIELD_NUMBER: _ClassVar[int]
+    result: str
+    def __init__(self, result: _Optional[str] = ...) -> None: ...
 
 class AuthenticationChallengeRequest(_message.Message):
     __slots__ = ("user", "r1", "r2")

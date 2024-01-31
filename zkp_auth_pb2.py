@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ezkp_auth.proto\x12\x08zkp_auth\"7\n\x0fRegisterRequest\x12\x0c\n\x04user\x18\x01 \x01(\t\x12\n\n\x02y1\x18\x02 \x01(\x03\x12\n\n\x02y2\x18\x03 \x01(\x03\"\x12\n\x10RegisterResponse\"F\n\x1e\x41uthenticationChallengeRequest\x12\x0c\n\x04user\x18\x01 \x01(\t\x12\n\n\x02r1\x18\x02 \x01(\x03\x12\n\n\x02r2\x18\x03 \x01(\x03\"=\n\x1f\x41uthenticationChallengeResponse\x12\x0f\n\x07\x61uth_id\x18\x01 \x01(\t\x12\t\n\x01\x63\x18\x02 \x01(\x03\"9\n\x1b\x41uthenticationAnswerRequest\x12\x0f\n\x07\x61uth_id\x18\x01 \x01(\t\x12\t\n\x01s\x18\x02 \x01(\x03\"2\n\x1c\x41uthenticationAnswerResponse\x12\x12\n\nsession_id\x18\x01 \x01(\t2\xac\x02\n\x04\x41uth\x12\x43\n\x08Register\x12\x19.zkp_auth.RegisterRequest\x1a\x1a.zkp_auth.RegisterResponse\"\x00\x12v\n\x1d\x43reateAuthenticationChallenge\x12(.zkp_auth.AuthenticationChallengeRequest\x1a).zkp_auth.AuthenticationChallengeResponse\"\x00\x12g\n\x14VerifyAuthentication\x12%.zkp_auth.AuthenticationAnswerRequest\x1a&.zkp_auth.AuthenticationAnswerResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ezkp_auth.proto\x12\x08zkp_auth\"7\n\x0fRegisterRequest\x12\x0c\n\x04user\x18\x01 \x01(\t\x12\n\n\x02y1\x18\x02 \x01(\x03\x12\n\n\x02y2\x18\x03 \x01(\x03\"\"\n\x10RegisterResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"F\n\x1e\x41uthenticationChallengeRequest\x12\x0c\n\x04user\x18\x01 \x01(\t\x12\n\n\x02r1\x18\x02 \x01(\x03\x12\n\n\x02r2\x18\x03 \x01(\x03\"=\n\x1f\x41uthenticationChallengeResponse\x12\x0f\n\x07\x61uth_id\x18\x01 \x01(\t\x12\t\n\x01\x63\x18\x02 \x01(\x03\"9\n\x1b\x41uthenticationAnswerRequest\x12\x0f\n\x07\x61uth_id\x18\x01 \x01(\t\x12\t\n\x01s\x18\x02 \x01(\x03\"2\n\x1c\x41uthenticationAnswerResponse\x12\x12\n\nsession_id\x18\x01 \x01(\t2\xac\x02\n\x04\x41uth\x12\x43\n\x08Register\x12\x19.zkp_auth.RegisterRequest\x1a\x1a.zkp_auth.RegisterResponse\"\x00\x12v\n\x1d\x43reateAuthenticationChallenge\x12(.zkp_auth.AuthenticationChallengeRequest\x1a).zkp_auth.AuthenticationChallengeResponse\"\x00\x12g\n\x14VerifyAuthentication\x12%.zkp_auth.AuthenticationAnswerRequest\x1a&.zkp_auth.AuthenticationAnswerResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,15 +24,15 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_REGISTERREQUEST']._serialized_start=28
   _globals['_REGISTERREQUEST']._serialized_end=83
   _globals['_REGISTERRESPONSE']._serialized_start=85
-  _globals['_REGISTERRESPONSE']._serialized_end=103
-  _globals['_AUTHENTICATIONCHALLENGEREQUEST']._serialized_start=105
-  _globals['_AUTHENTICATIONCHALLENGEREQUEST']._serialized_end=175
-  _globals['_AUTHENTICATIONCHALLENGERESPONSE']._serialized_start=177
-  _globals['_AUTHENTICATIONCHALLENGERESPONSE']._serialized_end=238
-  _globals['_AUTHENTICATIONANSWERREQUEST']._serialized_start=240
-  _globals['_AUTHENTICATIONANSWERREQUEST']._serialized_end=297
-  _globals['_AUTHENTICATIONANSWERRESPONSE']._serialized_start=299
-  _globals['_AUTHENTICATIONANSWERRESPONSE']._serialized_end=349
-  _globals['_AUTH']._serialized_start=352
-  _globals['_AUTH']._serialized_end=652
+  _globals['_REGISTERRESPONSE']._serialized_end=119
+  _globals['_AUTHENTICATIONCHALLENGEREQUEST']._serialized_start=121
+  _globals['_AUTHENTICATIONCHALLENGEREQUEST']._serialized_end=191
+  _globals['_AUTHENTICATIONCHALLENGERESPONSE']._serialized_start=193
+  _globals['_AUTHENTICATIONCHALLENGERESPONSE']._serialized_end=254
+  _globals['_AUTHENTICATIONANSWERREQUEST']._serialized_start=256
+  _globals['_AUTHENTICATIONANSWERREQUEST']._serialized_end=313
+  _globals['_AUTHENTICATIONANSWERRESPONSE']._serialized_start=315
+  _globals['_AUTHENTICATIONANSWERRESPONSE']._serialized_end=365
+  _globals['_AUTH']._serialized_start=368
+  _globals['_AUTH']._serialized_end=668
 # @@protoc_insertion_point(module_scope)
