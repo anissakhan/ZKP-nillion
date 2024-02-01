@@ -13,7 +13,9 @@ import zkp_auth_pb2_grpc
 # y2_global=0
 # r1_global=0
 # r2_global=0
-c_global=0
+g_global=4
+h_global=9
+p_global=23
 
 class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
     """Provides methods that implement functionality of zkp auth server."""
@@ -56,11 +58,13 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         # temporary global variables
         global r1_global
         global r2_global
+        global c_global
 
         user = request.user
         r1_global=request.r1
         r2_global=request.r2
-        c_global=random.randint(2, 5) # TODO: What should the random value be selected from...does it matter?
+        # c_global=random.randint(2, 5) # TODO: What should the random value be selected from...does it matter?
+        c_global=4
 
         # TODO when add database, use user value to look up in the table for that user instead of comparing user==user_temp_global. If user doesn't exist in the database, return None
         if user==user_global:
@@ -74,7 +78,21 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         "request" param is AuthenticationAnswerRequest that comes from client - s calculated
         Return AuthenticationAnswerResponse - calculate r1 and r2 and verify it matches the original values and then respond with a session id if successful and nothing if not?
         """
-        pass
+
+        # Server verifies client by checking r1 and r2 using 's'
+
+        auth_id=request.auth_id
+        s=request.s
+
+        r1=((g_global**s)*(y1_global**c_global))%p_global
+        r2=(h_global**s)*(y2_global**c_global)%p_global
+
+        if auth_id==user_global and r1==r1_global and r2==r2_global:
+            return zkp_auth_pb2.AuthenticationAnswerResponse(session_id="success")
+        else:
+            return zkp_auth_pb2.AuthenticationAnswerResponse(session_id="fail")
+
+        # if auth_id==user_global:
 
 # Start the GRPC service via serve() method
 def serve():
