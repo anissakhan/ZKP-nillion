@@ -31,21 +31,10 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         "request" param is RegisterRequest that comes from the client - y1, y2
         Return a string to the client that says "registered successfully"?
 
-        question: where to store y1 and y2
+        TODO: add more info to docstrings
         """
 
-        # temporary globals
-        # global user_global
-        # global y1_global
-        # global y2_global
-
-        # Store y1 and y2 on the server
-        # user_global=request.user
-        # y1_global=request.y1
-        # y2_global=request.y2
-
-
-        # Assuming 'user_entry' is a dictionary containing entry information
+        # Store y1 and y2 on the server's "db"
         user_entry={
             "user": request.user,
             "y1": request.y1,
@@ -79,11 +68,6 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         Return AuthenticationChallengeResponse - c along with an authentication ID (part of the message in proto file)
         """
 
-        # temporary global variables
-        # global r1_global
-        # global r2_global
-        # global c_global
-
         user = request.user
         r1=request.r1
         r2=request.r2
@@ -98,7 +82,6 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
         # Open the file in read mode to get the existing content
         with open("server_user_db.json", "r") as server_user_db_file:
-            # Load the existing entries
             existing_entries=json.load(server_user_db_file)
 
         # Check if the user already exists
@@ -122,14 +105,16 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         # but they get the auth_id from the user,
         # not their username (username is stored in the db)
 
-        auth_id=request.auth_id
-        s=request.s
+        # initialize user specific vars stored locally on the server
         user=""
         y1=-1
         y2=-1
         c=-1
         r1_from_user=-1
         r2_from_user=-1
+
+        auth_id=request.auth_id
+        s=request.s
 
         # find the auth_id in the local_user_info array to find the user
         for user_info in local_user_info:
