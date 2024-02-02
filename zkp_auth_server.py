@@ -8,12 +8,7 @@ import random
 import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
-# temporary local server variables
-# user_global="user0"
-# y1_global=0
-# y2_global=0
-# r1_global=0
-# r2_global=0
+# local server variables
 g_global=4
 h_global=9
 p_global=23
