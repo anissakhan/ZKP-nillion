@@ -43,7 +43,7 @@ def run():
             # Client computes 's' using 'c' and sends to server to verify identity
             q=11 #TODO WHAT IS Q
             s=k-c*x_global % q
-            auth_verify_response = stub.VerifyAuthentication(zkp_auth_pb2.AuthenticationAnswerRequest(auth_id="anissa", s=s))
+            auth_verify_response = stub.VerifyAuthentication(zkp_auth_pb2.AuthenticationAnswerRequest(auth_id=auth_req_response.auth_id, s=s))
             if "success" in auth_verify_response.session_id:
                 print("Authentication successful.")
             else:

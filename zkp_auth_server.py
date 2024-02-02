@@ -2,6 +2,7 @@
 
 from concurrent import futures
 import grpc
+import json
 import logging
 import random
 import zkp_auth_pb2
@@ -34,17 +35,40 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         """
 
         # temporary globals
-        global user_global
-        global y1_global
-        global y2_global
+        # global user_global
+        # global y1_global
+        # global y2_global
 
         # Store y1 and y2 on the server
-        user_global=request.user
-        y1_global=request.y1
-        y2_global=request.y2
+        # user_global=request.user
+        # y1_global=request.y1
+        # y2_global=request.y2
 
-        # debug print values
-        # return zkp_auth_pb2.RegisterResponse(result = f"registration successful {y1_temp_global=} {y2_temp_global=} {user_temp_global=}")
+
+        # Assuming 'user_entry' is a dictionary containing entry information
+        user_entry={
+            "user": request.user,
+            "y1": request.y1,
+            "y2": request.y2
+        }
+
+        # Open the file in read mode to get the existing content
+        with open("server_user_db.json", "r") as server_user_db_file:
+            # Load the existing entries
+            existing_entries=json.load(server_user_db_file)
+
+        # Check if the user already exists
+        existing_users=[entry["user"] for entry in existing_entries]
+        if user_entry["user"] in existing_users:
+            print(f"User '{user_entry['user']}' already exists.")
+        else:
+            # Append the new entry to the existing entries
+            existing_entries.append(user_entry)
+
+            # Open the file in write mode and write the updated entries
+            with open("server_user_db.json", "w") as server_user_db_file:
+                # Write the updated entries to the file
+                json.dump(existing_entries, server_user_db_file, indent=2)
 
         # Server sends back validation message that the registration was successful
         return zkp_auth_pb2.RegisterResponse(result = f"registration successful")
@@ -56,19 +80,31 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         """
 
         # temporary global variables
-        global r1_global
-        global r2_global
-        global c_global
+        # global r1_global
+        # global r2_global
+        # global c_global
 
         user = request.user
-        r1_global=request.r1
-        r2_global=request.r2
+        r1=request.r1
+        r2=request.r2
         # c_global=random.randint(2, 5) # TODO: What should the random value be selected from...does it matter?
-        c_global=4
+        c=4
 
-        # TODO when add database, use user value to look up in the table for that user instead of comparing user==user_temp_global. If user doesn't exist in the database, return None
-        if user==user_global:
-            return zkp_auth_pb2.AuthenticationChallengeResponse(auth_id="anissa", c=c_global) # TODO: what value should auth_id be?
+        # array to store auth_ids
+        global local_user_info
+        # TODO: generate the user id using the secrets library; does it matter if a user is already in this list?
+        local_user_info=[{"user": user, "auth_id": user+"temp", "r1": r1, "r2": r2, "c": c}]
+
+
+        # Open the file in read mode to get the existing content
+        with open("server_user_db.json", "r") as server_user_db_file:
+            # Load the existing entries
+            existing_entries=json.load(server_user_db_file)
+
+        # Check if the user already exists
+        existing_users=[entry["user"] for entry in existing_entries]
+        if user in existing_users:
+            return zkp_auth_pb2.AuthenticationChallengeResponse(auth_id=user+"temp", c=c) # TODO: what value should auth_id be?
         else:
             # TODO What do I return if the user does not exist in the database as a registered user? Unable to return None here
             return zkp_auth_pb2.AuthenticationChallengeResponse(auth_id="user does not exist", c=0)
@@ -81,18 +117,44 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
         # Server verifies client by checking r1 and r2 using 's'
 
+        # TODO: server needs to find the right
+        # user to look up their y1 and y2 in the db
+        # but they get the auth_id from the user,
+        # not their username (username is stored in the db)
+
         auth_id=request.auth_id
         s=request.s
+        user=""
+        y1=-1
+        y2=-1
+        c=-1
+        r1_from_user=-1
+        r2_from_user=-1
 
-        r1=((g_global**s)*(y1_global**c_global))%p_global
-        r2=(h_global**s)*(y2_global**c_global)%p_global
+        # find the auth_id in the local_user_info array to find the user
+        for user_info in local_user_info:
+            if user_info["auth_id"]==auth_id:
+                user=user_info["user"]
+                c=user_info["c"]
+                r1_from_user=user_info["r1"]
+                r2_from_user=user_info["r2"]
 
-        if auth_id==user_global and r1==r1_global and r2==r2_global:
-            return zkp_auth_pb2.AuthenticationAnswerResponse(session_id="success")
+        # then get y1 and y2 from the db
+        with open("server_user_db.json", "r") as server_user_db_file:
+            existing_entries = json.load(server_user_db_file)
+
+        for entry in existing_entries:
+            if entry["user"]==user:
+                y1=entry["y1"]
+                y2=entry["y2"]
+
+        r1=((g_global**s)*(y1**c))%p_global
+        r2=(h_global**s)*(y2**c)%p_global
+
+        if r1==r1_from_user and r2==r2_from_user:
+            return zkp_auth_pb2.AuthenticationAnswerResponse(session_id="success") # TODO: make this more unique?
         else:
             return zkp_auth_pb2.AuthenticationAnswerResponse(session_id="fail")
-
-        # if auth_id==user_global:
 
 # Start the GRPC service via serve() method
 def serve():
