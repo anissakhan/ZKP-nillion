@@ -12,6 +12,7 @@ import zkp_auth_pb2_grpc
 g_global=4
 h_global=9
 p_global=23
+local_user_info=[]
 
 class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
     """Provides methods that implement functionality of zkp auth server."""
@@ -44,7 +45,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         # Check if the user already exists
         existing_users=[entry["user"] for entry in existing_entries]
         if user_entry["user"] in existing_users:
-            print(f"User '{user_entry['user']}' already exists.")
+            return zkp_auth_pb2.RegisterResponse(result = f"User '{user_entry['user']}' already exists.")
         else:
             # Append the new entry to the existing entries
             existing_entries.append(user_entry)
@@ -54,7 +55,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
                 # Write the updated entries to the file
                 json.dump(existing_entries, server_user_db_file, indent=2)
 
-        # Server sends back validation message that the registration was successful
+        # Server sends back message that the registration was successful
         return zkp_auth_pb2.RegisterResponse(result = f"registration successful")
 
     def CreateAuthenticationChallenge(self, request, context):
@@ -72,8 +73,13 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         # array to store auth_ids
         global local_user_info
         # TODO: generate the user id using the secrets library; does it matter if a user is already in this list?
-        local_user_info=[{"user": user, "auth_id": user+"temp", "r1": r1, "r2": r2, "c": c}]
-
+        local_user_info.append(
+            {"user": user,
+             "auth_id": user+"temp",
+             "r1": r1,
+             "r2": r2,
+             "c": c}
+             )
 
         # Open the file in read mode to get the existing content
         with open("server_user_db.json", "r") as server_user_db_file:
@@ -89,16 +95,11 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
     def VerifyAuthentication(self, request, context):
         """
-        "request" param is AuthenticationAnswerRequest that comes from client - s calculated
+        "request" param is AuthenticationAnswerRequest received from client - s calculated
         Return AuthenticationAnswerResponse - calculate r1 and r2 and verify it matches the original values and then respond with a session id if successful and nothing if not?
         """
 
         # Server verifies client by checking r1 and r2 using 's'
-
-        # TODO: server needs to find the right
-        # user to look up their y1 and y2 in the db
-        # but they get the auth_id from the user,
-        # not their username (username is stored in the db)
 
         # initialize user specific vars stored locally on the server
         user=""
@@ -128,8 +129,8 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
                 y1=entry["y1"]
                 y2=entry["y2"]
 
-        r1=((g_global**s)*(y1**c))%p_global
-        r2=(h_global**s)*(y2**c)%p_global
+        r1=(pow(g_global,s)*pow(y1, c))%p_global
+        r2=(pow(h_global,s)*pow(y2,c))%p_global
 
         if r1==r1_from_user and r2==r2_from_user:
             return zkp_auth_pb2.AuthenticationAnswerResponse(session_id="success") # TODO: make this more unique?

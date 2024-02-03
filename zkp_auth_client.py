@@ -3,6 +3,7 @@
 import grpc
 import logging
 import random
+import sys
 import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
@@ -16,39 +17,60 @@ def run():
     with grpc.insecure_channel("localhost:50051") as channel:
         stub = zkp_auth_pb2_grpc.AuthStub(channel)
 
-        # Client registration
-        # Client calculates y1 and y2 and sends to server for registration
-        y1=(g_global**x_global)%p_global
-        y2=(h_global**x_global)%p_global
-        register_response = stub.Register(zkp_auth_pb2.RegisterRequest(user="anissa", y1=y1, y2=y2))
-        print("Registration result: " + register_response.result)
+        # Get command line args
+        n = len(sys.argv)
 
-        # Client authentication request
-        # Client generates random 'k', calculates r1, r2 and sends to server to request authentication
-        # TODO: try using the secrets library instead to generate x and k? https://docs.python.org/3/library/secrets.html#module-secrets
-        # k=random.randint(2,5)
-        k=7
-        r1=(g_global**k)%p_global
-        r2=(h_global**k)%p_global
-        print(f"{r1=}, {r2=}")
-        auth_req_response=stub.CreateAuthenticationChallenge(zkp_auth_pb2.AuthenticationChallengeRequest(user="anissa", r1=r1, r2=r2))
+        if n<2:
+                print("Usage: python script_name.py <action>")
+                print("  - action: 'register'/'reg' or 'authenticate'/'auth'")
+                sys.exit(1)
 
-        if "user does not exist" in auth_req_response.auth_id:
-            print("Authentication Request failed. User does not exist.")
+        action=sys.argv[1]
+        valid_actions = ["register", "reg", "authenticate", "auth"]
+        if action in valid_actions:
+            user=input("Input username: ")
         else:
-            print(f"Authentication Request accepted. User auth_id is '{auth_req_response.auth_id}'")
-            c = auth_req_response.c
+            print("Action invalid")
+            print("Usage: python script_name.py <action>")
+            print("  - action: 'register' or 'authenticate'")
+            sys.exit(1)
 
-            # Client proves identity to complete authentication
-            # Client computes 's' using 'c' and sends to server to verify identity
-            q=11 #TODO WHAT IS Q
-            s=k-c*x_global % q
-            auth_verify_response = stub.VerifyAuthentication(zkp_auth_pb2.AuthenticationAnswerRequest(auth_id=auth_req_response.auth_id, s=s))
-            if "success" in auth_verify_response.session_id:
-                print("Authentication successful.")
+        if action == "register" or action=="reg":
+            # Client registration
+            # Client calculates y1 and y2 and sends to server for registration
+            y1=pow(g_global, x_global, p_global)
+            y2=pow(h_global, x_global, p_global)
+            register_response = stub.Register(zkp_auth_pb2.RegisterRequest(user=user, y1=y1, y2=y2))
+            print("Registration result: " + register_response.result)
+        elif action == "authenticate" or action=="auth":
+            # Client authentication request
+            # Client generates random 'k', calculates r1, r2 and sends to server to request authentication
+            # TODO: try using the secrets library instead to generate x and k? https://docs.python.org/3/library/secrets.html#module-secrets
+            # k=random.randint(2,5)
+            k=7
+            r1=pow(g_global, k, p_global)
+            r2=pow(h_global, k, p_global)
+            print(f"{r1=}, {r2=}")
+            auth_req_response=stub.CreateAuthenticationChallenge(zkp_auth_pb2.AuthenticationChallengeRequest(user=user, r1=r1, r2=r2))
+
+            if "user does not exist" in auth_req_response.auth_id:
+                print("Authentication Request failed. User does not exist. You must register first.")
             else:
-                print("Authentication failed.")
+                print(f"Authentication Request accepted. User auth_id is '{auth_req_response.auth_id}'")
+                c = auth_req_response.c
 
+                # Client proves identity to complete authentication
+                # Client computes 's' using 'c' and sends to server to verify identity
+                q=11
+                s=(k-c*x_global) % q
+                auth_verify_response = stub.VerifyAuthentication(zkp_auth_pb2.AuthenticationAnswerRequest(auth_id=auth_req_response.auth_id, s=s))
+                if "success" in auth_verify_response.session_id:
+                    print("Authentication successful.")
+                else:
+                    print("Authentication failed.")
+        else:
+            print("Action failed.")
+            sys.exit(1)
 
 
 if __name__ == "__main__":
