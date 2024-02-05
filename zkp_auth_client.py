@@ -7,7 +7,7 @@ import sys
 import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
-# temporary global client vars; these values don't change so can declare them here
+# global client vars; p, g, h assumed to be public information
 p_global = 100043
 g_global = 4453
 h_global = 3459
@@ -52,13 +52,12 @@ def run():
             k=secrets.randbelow(99)
             r1=pow(g_global, k, p_global)
             r2=pow(h_global, k, p_global)
-            print(f"{r1=}, {r2=}")
             auth_req_response=stub.CreateAuthenticationChallenge(zkp_auth_pb2.AuthenticationChallengeRequest(user=user, r1=r1, r2=r2))
 
             if "user does not exist" in auth_req_response.auth_id:
                 print("Authentication Request failed. User does not exist. You must register first.")
             else:
-                print(f"Authentication Request accepted. User auth_id is '{auth_req_response.auth_id}'")
+                print(f"Authentication Request accepted.")
                 c = auth_req_response.c
 
                 # Client proves identity to complete authentication

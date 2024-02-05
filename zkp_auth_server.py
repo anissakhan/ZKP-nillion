@@ -10,7 +10,7 @@ import secrets
 import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
-# local server variables
+# global server variables; p, g, h assumed to be public information
 p_global=100043
 g_global=4453
 h_global=3459
@@ -48,20 +48,15 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
     def Register(self, request, context):
         """
-        Server recieves a registration request from the client and responds.
+        Server receives a registration request from the client and responds.
 
         Args:
-            request
+            request (RegisterRequest): RegisterRequest is received from the client and contains 'user', 'y1', 'y2'
         Returns:
-
-        Param = RegisterRequest
-        Returns RegisterResponse
-
-        "request" param is RegisterRequest that comes from the client - y1, y2
-        Return a string to the client that says "registered successfully"?
+            RegisterResponse: returned message contains 'result' which indicates either registration successful, or user already exists.
         """
 
-        # Store y1 and y2 on the server's "db"
+        # Store y1 and y2 on the server's "db" (json file used to simulate a db)
         user_entry={
             "user": request.user,
             "y1": request.y1,
@@ -86,8 +81,13 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
     def CreateAuthenticationChallenge(self, request, context):
         """
-        "request" param is AuthenticationChallengeRequest that comes from client - r1 and r2
-        Return AuthenticationChallengeResponse - c along with an authentication ID (part of the message in proto file)
+        Server receives an authentication request from the client, and returns an authentication challenge.
+
+        Args:
+            request (AuthenticationChallengeRequest): AuthenticationChallengeRequest is received from the client and contains 'r1', 'r2'
+        Returns:
+            AuthenticationChallengeResponse: returned message contains 'auth_id' and 'c' as part of a challenge necessary for client to prove identity.
+                                             If user does not exist, returns failure message.
         """
 
         user = request.user
@@ -95,7 +95,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         r2=request.r2
         c=secrets.randbelow(99)
 
-        # array to store auth_ids and other session specific user info
+        # array to store auth_ids and other session specific user info to account for concurrent auth requests
         global local_user_info
         id=secrets.randbelow(90000)+10000
         local_user_info.append(
@@ -117,11 +117,18 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
     def VerifyAuthentication(self, request, context):
         """
-        "request" param is AuthenticationAnswerRequest received from client - s calculated
-        Return AuthenticationAnswerResponse - calculate r1 and r2 and verify it matches the original values and then respond with a session id if successful and nothing if not?
-        """
+        Server verifies client by checking r1 and r2 using 's'
 
-        # Server verifies client by checking r1 and r2 using 's'
+        Server receives client's response to the authentication challenge and verifies identity for either successful or failed authentication.
+
+        Args:
+            request (AuthenticationAnswerRequest): AuthenticationAnswerRequest is received from client and contains 'auth_id' and 's',
+                                                   where 's' is the response to the authentication challenge
+        Returns:
+            AuthenticationAnswerResponse: returned message contains a session_id. If authentication succeeds, session_id is a numerical value
+                                          stored in a string. Otherwise, "fail"
+
+        """
 
         # initialize user specific vars stored locally on the server
         user=""
@@ -134,7 +141,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         auth_id=request.auth_id
         s=request.s
 
-        # find the auth_id in the local_user_info array to find the user
+        # find the auth_id in the local_user_info array to find the username and other relevant info
         for user_info in local_user_info:
             if user_info["auth_id"]==auth_id:
                 user=user_info["user"]
@@ -142,7 +149,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
                 r1_from_user=user_info["r1"]
                 r2_from_user=user_info["r2"]
 
-        # then get y1 and y2 from the db
+        # then get y1 and y2 from the "db"
         existing_entries = read_write_user_db(mode="r")
 
         for entry in existing_entries:
@@ -150,6 +157,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
                 y1=entry["y1"]
                 y2=entry["y2"]
 
+        # server calculates r1 and r2; verify they match the original value passed by the client
         r1=(pow(g_global,s)*pow(y1, c))%p_global
         r2=(pow(h_global,s)*pow(y2,c))%p_global
 
