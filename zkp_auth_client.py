@@ -2,7 +2,7 @@
 
 import grpc
 import logging
-import random
+import secrets
 import sys
 import zkp_auth_pb2
 import zkp_auth_pb2_grpc
@@ -45,9 +45,7 @@ def run():
         elif action == "authenticate" or action=="auth":
             # Client authentication request
             # Client generates random 'k', calculates r1, r2 and sends to server to request authentication
-            # TODO: try using the secrets library instead to generate x and k? https://docs.python.org/3/library/secrets.html#module-secrets
-            # k=random.randint(2,5)
-            k=7
+            k=secrets.randbelow(99)
             r1=pow(g_global, k, p_global)
             r2=pow(h_global, k, p_global)
             print(f"{r1=}, {r2=}")
@@ -64,7 +62,7 @@ def run():
                 q=11
                 s=(k-c*x_global) % q
                 auth_verify_response = stub.VerifyAuthentication(zkp_auth_pb2.AuthenticationAnswerRequest(auth_id=auth_req_response.auth_id, s=s))
-                if "success" in auth_verify_response.session_id:
+                if "fail" not in auth_verify_response.session_id:
                     print("Authentication successful.")
                 else:
                     print("Authentication failed.")

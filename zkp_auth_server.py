@@ -5,6 +5,7 @@ import grpc
 import json
 import logging
 import random
+import secrets
 import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
@@ -67,15 +68,14 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         user = request.user
         r1=request.r1
         r2=request.r2
-        # c_global=random.randint(2, 5) # TODO: What should the random value be selected from...does it matter?
-        c=4
+        c=secrets.randbelow(99)
 
-        # array to store auth_ids
+        # array to store auth_ids and other session specific user info
         global local_user_info
-        # TODO: generate the user id using the secrets library; does it matter if a user is already in this list?
+        id=secrets.randbelow(90000)+10000
         local_user_info.append(
             {"user": user,
-             "auth_id": user+"temp",
+             "auth_id": f"{id}",
              "r1": r1,
              "r2": r2,
              "c": c}
@@ -88,10 +88,9 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         # Check if the user already exists
         existing_users=[entry["user"] for entry in existing_entries]
         if user in existing_users:
-            return zkp_auth_pb2.AuthenticationChallengeResponse(auth_id=user+"temp", c=c) # TODO: what value should auth_id be?
+            return zkp_auth_pb2.AuthenticationChallengeResponse(auth_id=f"{id}", c=c)
         else:
-            # TODO What do I return if the user does not exist in the database as a registered user? Unable to return None here
-            return zkp_auth_pb2.AuthenticationChallengeResponse(auth_id="user does not exist", c=0)
+            return zkp_auth_pb2.AuthenticationChallengeResponse(auth_id="user does not exist", c=-1)
 
     def VerifyAuthentication(self, request, context):
         """
@@ -133,7 +132,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
         r2=(pow(h_global,s)*pow(y2,c))%p_global
 
         if r1==r1_from_user and r2==r2_from_user:
-            return zkp_auth_pb2.AuthenticationAnswerResponse(session_id="success") # TODO: make this more unique?
+            return zkp_auth_pb2.AuthenticationAnswerResponse(session_id=f"{random.randint(10000, 99999)}")
         else:
             return zkp_auth_pb2.AuthenticationAnswerResponse(session_id="fail")
 
