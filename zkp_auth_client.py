@@ -1,4 +1,9 @@
-"""The Python implementation of the gRPC zkp authentication client."""
+"""
+File: zkp_auth_client.py
+Author: Anissa Khan
+Date: February 5, 2024
+Description: The Python implementation of the gRPC zkp authentication client.
+"""
 
 import grpc
 import logging
