@@ -6,7 +6,8 @@ import zkp_auth_pb2 as zkp__auth__pb2
 
 
 class AuthStub(object):
-    """Missing associated documentation comment in .proto file."""
+    """Authentication service enabling client to register and authenticate with a server.
+    """
 
     def __init__(self, channel):
         """Constructor.
@@ -32,22 +33,35 @@ class AuthStub(object):
 
 
 class AuthServicer(object):
-    """Missing associated documentation comment in .proto file."""
+    """Authentication service enabling client to register and authenticate with a server.
+    """
 
     def Register(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """A unary RPC.
+
+        Server receives a registration request from the client and responds.
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def CreateAuthenticationChallenge(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """A unary RPC.
+
+        Server receives an authentication request from the client, and returns an authentication challenge.
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def VerifyAuthentication(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """A unary RPC.
+
+        Server verifies client by checking r1 and r2 using 's'
+
+        Server receives client's response to the authentication challenge and verifies
+        identity for either successful or failed authentication.
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -78,7 +92,8 @@ def add_AuthServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class Auth(object):
-    """Missing associated documentation comment in .proto file."""
+    """Authentication service enabling client to register and authenticate with a server.
+    """
 
     @staticmethod
     def Register(request,

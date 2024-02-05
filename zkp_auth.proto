@@ -1,40 +1,66 @@
 syntax = "proto3";
 package zkp_auth;
 
+// Sent by client during initial registration request
+// Contains 'y1', and 'y2' which are calculated using public information
 message RegisterRequest {
     string user = 1;
     int64 y1 = 2;
     int64 y2 = 3;
 }
 
+// Returned to client by server after client's user registration
+// Field indicates whether registration was successful
 message RegisterResponse {
     //whether or not the message was successfully registered
     //changed from original template, which had this message empty (no fields)
     string result = 1; 
 }
 
+// Sent by client during authentication request
+// Contains commitment 'r1' and 'r2'
 message AuthenticationChallengeRequest {
     string user = 1;
     int64 r1 = 2;
     int64 r2 = 3;
 }
 
+// Returned to client by server as initial authentication step
+// Field 'c' is sent as challenge to client to prove identity
 message AuthenticationChallengeResponse {
     string auth_id = 1;
     int64 c = 2;
 }
 
+// Sent by client in response to authentication challenge
+// Field 's' is challenge response calculated by client to prove identity
 message AuthenticationAnswerRequest {
     string auth_id = 1;
     int64 s = 2;
 }
 
+// Returned to client by server to indicate whether or not authentication is successful
 message AuthenticationAnswerResponse {
     string session_id = 1;
 }
 
+// Authentication service enabling client to register and authenticate with a server.
 service Auth {
+    // A unary RPC.
+    //
+    // Server receives a registration request from the client and responds.
     rpc Register(RegisterRequest) returns(RegisterResponse){}
+
+    // A unary RPC.
+    //
+    // Server receives an authentication request from the client, and returns an authentication challenge.
     rpc CreateAuthenticationChallenge(AuthenticationChallengeRequest) returns(AuthenticationChallengeResponse){}
+
+    // A unary RPC.
+    //
+    // Server verifies client by checking r1 and r2 using 's'
+    //
+    // Server receives client's response to the authentication challenge and verifies
+    // identity for either successful or failed authentication.
     rpc VerifyAuthentication(AuthenticationAnswerRequest) returns(AuthenticationAnswerResponse){}
 }

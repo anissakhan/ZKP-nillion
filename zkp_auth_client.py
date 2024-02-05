@@ -19,7 +19,6 @@ def run():
 
         # Get command line args
         n = len(sys.argv)
-
         if n<2:
                 print("Usage: python script_name.py <action>")
                 print("  - action: 'register'/'reg' or 'authenticate'/'auth'")
