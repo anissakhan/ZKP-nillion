@@ -35,15 +35,15 @@ def run():
             print("  - action: 'register' or 'authenticate'")
             sys.exit(1)
 
+        # Client registration
         if action == "register" or action=="reg":
-            # Client registration
             # Client calculates y1 and y2 and sends to server for registration
             y1=pow(g_global, x_global, p_global)
             y2=pow(h_global, x_global, p_global)
             register_response = stub.Register(zkp_auth_pb2.RegisterRequest(user=user, y1=y1, y2=y2))
             print("Registration result: " + register_response.result)
+        # Client authentication request
         elif action == "authenticate" or action=="auth":
-            # Client authentication request
             # Client generates random 'k', calculates r1, r2 and sends to server to request authentication
             k=secrets.randbelow(99)
             r1=pow(g_global, k, p_global)

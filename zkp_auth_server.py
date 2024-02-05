@@ -1,6 +1,7 @@
 """The Python implementation of the gRPC zkp authentication server."""
 
 from concurrent import futures
+from typing import Optional
 import grpc
 import json
 import logging
@@ -15,10 +16,35 @@ h_global=9
 p_global=23
 local_user_info=[]
 
+# Helper methods
+def read_write_user_db(
+        mode: str,
+        existing_entries: Optional[list[dict]]=[]
+    )->list[dict]:
+    """
+    Open the json file containing user data to read or write content to the server's "database" of users.
+
+    Args:
+        mode (str): either "r" or "w" to indicate read or write mode, respectively
+    Returns:
+        list[dict]: If mode="r", returns list of dictionaries containing information about users.
+                    Example: [{'user': 'Anissa', 'y1': 22, 'y2': 12}]
+                    If mode="w", nothing to return
+    """
+
+    with open("server_user_db.json", mode) as server_user_db_file:
+        if "r" in mode:
+            # Load the existing entries
+            existing_entries=json.load(server_user_db_file)
+            return existing_entries
+        else:
+            # Write the updated entries to the file
+            json.dump(existing_entries, server_user_db_file, indent=2)
+
+
+
 class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
     """Provides methods that implement functionality of zkp auth server."""
-
-
 
     def Register(self, request, context):
         """
@@ -27,8 +53,6 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
         "request" param is RegisterRequest that comes from the client - y1, y2
         Return a string to the client that says "registered successfully"?
-
-        TODO: add more info to docstrings
         """
 
         # Store y1 and y2 on the server's "db"
@@ -38,10 +62,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
             "y2": request.y2
         }
 
-        # Open the file in read mode to get the existing content
-        with open("server_user_db.json", "r") as server_user_db_file:
-            # Load the existing entries
-            existing_entries=json.load(server_user_db_file)
+        existing_entries=read_write_user_db(mode="r")
 
         # Check if the user already exists
         existing_users=[entry["user"] for entry in existing_entries]
@@ -52,9 +73,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
             existing_entries.append(user_entry)
 
             # Open the file in write mode and write the updated entries
-            with open("server_user_db.json", "w") as server_user_db_file:
-                # Write the updated entries to the file
-                json.dump(existing_entries, server_user_db_file, indent=2)
+            read_write_user_db(mode="w", existing_entries=existing_entries)
 
         # Server sends back message that the registration was successful
         return zkp_auth_pb2.RegisterResponse(result = f"registration successful")
@@ -81,9 +100,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
              "c": c}
              )
 
-        # Open the file in read mode to get the existing content
-        with open("server_user_db.json", "r") as server_user_db_file:
-            existing_entries=json.load(server_user_db_file)
+        existing_entries=read_write_user_db(mode="r")
 
         # Check if the user already exists
         existing_users=[entry["user"] for entry in existing_entries]
@@ -120,8 +137,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
                 r2_from_user=user_info["r2"]
 
         # then get y1 and y2 from the db
-        with open("server_user_db.json", "r") as server_user_db_file:
-            existing_entries = json.load(server_user_db_file)
+        existing_entries = read_write_user_db("r")
 
         for entry in existing_entries:
             if entry["user"]==user:
