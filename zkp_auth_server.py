@@ -11,9 +11,9 @@ import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
 # local server variables
-g_global=4
-h_global=9
-p_global=23
+p_global=100043
+g_global=4453
+h_global=3459
 local_user_info=[]
 
 # Helper methods
@@ -48,6 +48,12 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
     def Register(self, request, context):
         """
+        Server recieves a registration request from the client and responds.
+
+        Args:
+            request
+        Returns:
+
         Param = RegisterRequest
         Returns RegisterResponse
 
@@ -137,7 +143,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
                 r2_from_user=user_info["r2"]
 
         # then get y1 and y2 from the db
-        existing_entries = read_write_user_db("r")
+        existing_entries = read_write_user_db(mode="r")
 
         for entry in existing_entries:
             if entry["user"]==user:
