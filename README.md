@@ -6,7 +6,7 @@ NOTE: tested on mac
 - run the server from one window and the client from the other:
 - Server usage: ```python zkp_auth_server.py```
 - Client usage: 
-```python script_name.py <action>``` where ``` action: 'register'/'reg' or 'authenticate'/'auth'```
+```python zkp_auth_client.py <action>``` where ``` action: 'register'/'reg' or 'authenticate'/'auth'```
 
 
 ## Thought process:

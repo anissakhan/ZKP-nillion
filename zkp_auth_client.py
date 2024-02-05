@@ -8,9 +8,9 @@ import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
 # global client vars; p, g, h assumed to be public information
-p_global = 179 # 179 # 100043
-g_global = 65 # 65 #4453
-h_global = 29 # 29 #3459
+p_global = 179 # 100043
+g_global = 65 # 4453
+h_global = 29 # 3459
 x=-1
 
 def run():
@@ -20,7 +20,7 @@ def run():
         # Get command line args
         n = len(sys.argv)
         if n<2:
-                print("Usage: python script_name.py <action>")
+                print("Usage: python zkp_auth_client.py <action>")
                 print("  - action: 'register'/'reg' or 'authenticate'/'auth'")
                 sys.exit(1)
 
@@ -61,7 +61,7 @@ def run():
 
                 # Client proves identity to complete authentication
                 # Client computes 's' using 'c' and sends to server to verify identity
-                q=89 #89 #50021
+                q=89 # 50021
                 s=(k-c*x) % q
                 auth_verify_response = stub.VerifyAuthentication(zkp_auth_pb2.AuthenticationAnswerRequest(auth_id=auth_req_response.auth_id, s=s))
                 if "fail" not in auth_verify_response.session_id:

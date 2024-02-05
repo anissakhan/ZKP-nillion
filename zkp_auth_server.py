@@ -11,9 +11,9 @@ import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
 # global server variables; p, g, h assumed to be public information
-p_global=179 # 179 #100043
-g_global=65 # 65 #4453
-h_global=29 #29 # 3459
+p_global=179 # 100043
+g_global=65 # 4453
+h_global=29 # 3459
 local_user_info=[]
 
 # Helper methods
