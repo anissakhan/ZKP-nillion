@@ -11,9 +11,9 @@ import zkp_auth_pb2
 import zkp_auth_pb2_grpc
 
 # global server variables; p, g, h assumed to be public information
-p_global=100043
-g_global=4453
-h_global=3459
+p_global=179 # 179 #100043
+g_global=65 # 65 #4453
+h_global=29 #29 # 3459
 local_user_info=[]
 
 # Helper methods
@@ -28,8 +28,8 @@ def read_write_user_db(
         mode (str): either "r" or "w" to indicate read or write mode, respectively
     Returns:
         list[dict]: If mode="r", returns list of dictionaries containing information about users.
-                    Example: [{'user': 'Anissa', 'y1': 22, 'y2': 12}]
-                    If mode="w", nothing to return
+            Example: [{'user': 'Anissa', 'y1': 22, 'y2': 12}]
+            If mode="w", nothing to return
     """
 
     with open("server_user_db.json", mode) as server_user_db_file:
@@ -87,7 +87,7 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
             request (AuthenticationChallengeRequest): AuthenticationChallengeRequest is received from the client and contains 'r1', 'r2'
         Returns:
             AuthenticationChallengeResponse: returned message contains 'auth_id' and 'c' as part of a challenge necessary for client to prove identity.
-                                             If user does not exist, returns failure message.
+                If user does not exist, returns failure message.
         """
 
         user = request.user
@@ -123,10 +123,10 @@ class AuthServicer(zkp_auth_pb2_grpc.AuthServicer):
 
         Args:
             request (AuthenticationAnswerRequest): AuthenticationAnswerRequest is received from client and contains 'auth_id' and 's',
-                                                   where 's' is the response to the authentication challenge
+                where 's' is the response to the authentication challenge
         Returns:
             AuthenticationAnswerResponse: returned message contains a session_id. If authentication succeeds, session_id is a numerical value
-                                          stored in a string. Otherwise, "fail"
+                stored in a string. Otherwise, "fail"
 
         """
 

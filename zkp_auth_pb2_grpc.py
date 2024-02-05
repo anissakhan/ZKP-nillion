@@ -37,27 +37,21 @@ class AuthServicer(object):
     """
 
     def Register(self, request, context):
-        """A unary RPC.
-
-        Server receives a registration request from the client and responds.
+        """Server receives a registration request from the client and responds.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def CreateAuthenticationChallenge(self, request, context):
-        """A unary RPC.
-
-        Server receives an authentication request from the client, and returns an authentication challenge.
+        """Server receives an authentication request from the client, and returns an authentication challenge.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def VerifyAuthentication(self, request, context):
-        """A unary RPC.
-
-        Server verifies client by checking r1 and r2 using 's'
+        """Server verifies client by checking r1 and r2 using 's'
 
         Server receives client's response to the authentication challenge and verifies
         identity for either successful or failed authentication.

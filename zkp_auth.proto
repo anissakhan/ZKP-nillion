@@ -46,18 +46,12 @@ message AuthenticationAnswerResponse {
 
 // Authentication service enabling client to register and authenticate with a server.
 service Auth {
-    // A unary RPC.
-    //
     // Server receives a registration request from the client and responds.
     rpc Register(RegisterRequest) returns(RegisterResponse){}
 
-    // A unary RPC.
-    //
     // Server receives an authentication request from the client, and returns an authentication challenge.
     rpc CreateAuthenticationChallenge(AuthenticationChallengeRequest) returns(AuthenticationChallengeResponse){}
 
-    // A unary RPC.
-    //
     // Server verifies client by checking r1 and r2 using 's'
     //
     // Server receives client's response to the authentication challenge and verifies
