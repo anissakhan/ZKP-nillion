@@ -4,7 +4,6 @@ Author: Anissa Khan
 Date: February 5, 2024
 Description: The Python implementation of the gRPC zkp authentication server.
 """
-"""The Python implementation of the gRPC zkp authentication server."""
 
 from concurrent import futures
 from typing import Optional
